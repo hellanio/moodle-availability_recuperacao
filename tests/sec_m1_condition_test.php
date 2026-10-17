@@ -291,10 +291,14 @@ final class sec_m1_condition_test extends \advanced_testcase {
     }
 
     /**
-     * EXPOSURE S-02 (= SEC-F3, M1.5): availability_recuperacao disabled, or availability disabled site wide, drops
-     * the condition silently (core lax parsing) and opens the target to every student.
+     * S-02 (= SEC-F3), fixed by the M1.5 guard: the core still drops the condition silently when
+     * availability_recuperacao is disabled or availability is off, but the guard of mod_recuperacao hides the target:
+     * at once for the plugin disabled (config_log_created), at the next run of its task for set_config() without event
+     * (F7, documented window). Updated by M1.5 from the original exposure test, which asserted the target opened.
      */
-    public function test_exposure_plugin_disabled_opens(): void {
+    public function test_exposure_plugin_disabled_closed_by_guard(): void {
+        // The guard observer is external: it runs outside a transaction, as after a real request commits.
+        $this->preventResetByRollback();
         $this->set_availability($this->tree('and'));
         $none = $this->users['none'];
         $this->assertFalse($this->cm($none)->uservisible);
@@ -302,7 +306,7 @@ final class sec_m1_condition_test extends \advanced_testcase {
         \core\plugininfo\availability::enable_plugin('recuperacao', 0);
         \core_plugin_manager::reset_caches();
         rebuild_course_cache((int) $this->course->id, true);
-        $this->assertTrue($this->cm($none)->uservisible, 'S-02: disabled condition plugin opens the target');
+        $this->assertFalse($this->cm($none)->uservisible, 'S-02: the guard hides the target of a disabled condition');
 
         \core\plugininfo\availability::enable_plugin('recuperacao', 1);
         \core_plugin_manager::reset_caches();
@@ -311,7 +315,11 @@ final class sec_m1_condition_test extends \advanced_testcase {
 
         set_config('enableavailability', 0);
         rebuild_course_cache((int) $this->course->id, true);
-        $this->assertTrue($this->cm($none)->uservisible, 'S-02: enableavailability=0 opens the target');
+        $this->assertTrue($this->cm($none)->uservisible, 'F7: set_config() without event stays open until the task');
+        ob_start();
+        (new \mod_recuperacao\task\guard_targets())->execute();
+        ob_end_clean();
+        $this->assertFalse($this->cm($none)->uservisible, 'S-02: the guard task hides the target');
     }
 
     /**
