@@ -55,6 +55,9 @@ class behat_availability_recuperacao extends behat_base {
             \availability_recuperacao\condition::get_json($roundid),
             \availability_date\condition::get_json('>=', 1),
         ], \core_availability\tree::OP_OR, false);
-        $this->execute('behat_forms::i_set_the_field_to', ['availabilityconditionsjson', json_encode($root)]);
+        // The core field type refuses to replace existing restrictions, so the raw form field is written, as a
+        // browser without the frontend would submit it.
+        $field = $this->find('css', '[name="availabilityconditionsjson"]');
+        $field->setValue(json_encode($root));
     }
 }
