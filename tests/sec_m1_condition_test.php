@@ -328,22 +328,21 @@ final class sec_m1_condition_test extends \advanced_testcase {
     }
 
     /**
-     * EXPOSURE S-03 (low): target_access caches the round row for the whole PHP process (long cron runs too);
-     * a target change in the same process keeps the OLD target open for sent students until reset_caches().
+     * S-03 (fixed in M1.3): target_access caches nothing, so a target change in the same process (long cron runs
+     * too) closes the OLD target and opens the new one at once, without reset_caches().
      */
-    public function test_exposure_round_cache_is_process_wide(): void {
+    public function test_round_target_change_applies_in_process(): void {
         global $DB;
+        $this->set_availability($this->tree('and'));
         $sent = $this->users[state_machine::STATUS_SENT];
         $other = $this->getDataGenerator()->create_module('page', ['course' => $this->course->id]);
         $this->assertTrue(target_access::is_eligible((int) $this->round->id, $sent, (int) $this->target->cmid));
+        $this->assertTrue($this->cm($sent)->uservisible);
         $DB->set_field('recuperacao', 'targetcmid', $other->cmid, ['id' => $this->round->id]);
-        $this->assertTrue(target_access::is_eligible((int) $this->round->id, $sent, (int) $this->target->cmid),
-            'S-03: stale round row');
-        $this->assertFalse(target_access::is_eligible((int) $this->round->id, $sent, (int) $other->cmid),
-            'stale cache fails closed for the new target');
-        target_access::reset_caches();
-        $this->assertFalse(target_access::is_eligible((int) $this->round->id, $sent, (int) $this->target->cmid));
+        $oldtarget = target_access::is_eligible((int) $this->round->id, $sent, (int) $this->target->cmid);
+        $this->assertFalse($oldtarget, 'S-03: old target closed at once');
         $this->assertTrue(target_access::is_eligible((int) $this->round->id, $sent, (int) $other->cmid));
+        $this->assertFalse($this->cm($sent)->uservisible);
     }
 
     /**
