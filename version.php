@@ -25,10 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'availability_recuperacao';
-$plugin->version   = 2026101700;
-$plugin->release   = '0.1.0';
+$plugin->version   = 2026101701;
+$plugin->release   = '0.2.0';
 $plugin->requires  = 2025100600; // Moodle 5.1 (ADR-013).
 $plugin->supported = [501, 502];
 $plugin->maturity  = MATURITY_ALPHA;
-// The access contract is mod_recuperacao\local\access\target_access; the condition fails closed without it.
-$plugin->dependencies = ['mod_recuperacao' => 2026093003];
+// The access contract is mod_recuperacao\local\access\target_access, and its guard is mod_recuperacao\local\target_guard
+// (install and uninstall callbacks, M1.5); the condition fails closed without them.
+$plugin->dependencies = ['mod_recuperacao' => 2026101700];
