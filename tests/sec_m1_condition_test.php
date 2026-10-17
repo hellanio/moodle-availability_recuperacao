@@ -64,13 +64,21 @@ final class sec_m1_condition_test extends \advanced_testcase {
         target_access::reset_caches();
         $this->generator = $this->getDataGenerator()->get_plugin_generator('mod_recuperacao');
         $this->course = $this->getDataGenerator()->create_course();
-        $this->target = $this->getDataGenerator()->create_module('page',
-            ['course' => $this->course->id, 'name' => self::TARGET_NAME]);
+        $this->target = $this->getDataGenerator()->create_module(
+            'page',
+            ['course' => $this->course->id, 'name' => self::TARGET_NAME]
+        );
         $this->round = $this->generator->create_instance(['course' => $this->course->id,
             'targetcmid' => $this->target->cmid]);
         $this->group = $this->getDataGenerator()->create_group(['courseid' => $this->course->id]);
-        foreach (['none', state_machine::STATUS_IDENTIFIED, state_machine::STATUS_SENT,
-                state_machine::STATUS_APPROVED, state_machine::STATUS_CANCELLED] as $status) {
+        $statuses = [
+            'none',
+            state_machine::STATUS_IDENTIFIED,
+            state_machine::STATUS_SENT,
+            state_machine::STATUS_APPROVED,
+            state_machine::STATUS_CANCELLED,
+        ];
+        foreach ($statuses as $status) {
             $user = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
             if ($status !== 'none') {
                 $this->generator->create_case(['recuperacaoid' => (int) $this->round->id,
@@ -224,8 +232,12 @@ final class sec_m1_condition_test extends \advanced_testcase {
         $this->set_availability($this->tree('and'));
         $sent = $this->users[state_machine::STATUS_SENT];
         $this->assertTrue($this->cm($sent)->uservisible);
-        $DB->set_field('recuperacao_case', 'status', state_machine::STATUS_APPROVED,
-            ['recuperacaoid' => $this->round->id, 'userid' => $sent]);
+        $DB->set_field(
+            'recuperacao_case',
+            'status',
+            state_machine::STATUS_APPROVED,
+            ['recuperacaoid' => $this->round->id, 'userid' => $sent]
+        );
         // No reset_caches(), no rebuild_course_cache(): only the per-request modinfo is dropped by cm().
         $this->assertFalse($this->cm($sent)->uservisible);
     }
@@ -315,8 +327,9 @@ final class sec_m1_condition_test extends \advanced_testcase {
         $this->set_availability(tree::get_root_json([$this->rec(), $date::get_json('>=', $past)], tree::OP_OR, false));
         $this->assertTrue($this->cm($none)->uservisible, 'S-01: OR[rec, date past] opens to everyone');
 
-        $this->set_availability(tree::get_root_json([$this->rec(), $date::get_json('>=', $future)], tree::OP_NOT_AND,
-            false));
+        $this->set_availability(
+            tree::get_root_json([$this->rec(), $date::get_json('>=', $future)], tree::OP_NOT_AND, false)
+        );
         $this->assertTrue($this->cm($none)->uservisible, 'S-01: !&[rec, date future] opens to everyone');
 
         // Root AND with showc=true: closed, but the target name is on the course page (P0-1 requires showc=false).
