@@ -33,6 +33,6 @@ $string['error_unavailableround'] = 'This round does not use this activity as it
 $string['pluginname'] = 'Restriction by recovery round';
 $string['privacy:metadata'] = 'The Restriction by recovery round plugin does not store any personal data.';
 $string['requires_notrecuperacao'] = 'This restriction cannot be negated: nobody gets access through it';
-$string['requires_recuperacao'] = 'Available to students of the recovery round (sent, and passed or failed as the round settings allow)';
+$string['requires_recuperacao'] = 'You are a student of the recovery round (sent or, as the round settings allow, passed or failed)';
 $string['title'] = 'Recovery round';
 $string['unavailableround'] = 'Round not available (#{$a})';
