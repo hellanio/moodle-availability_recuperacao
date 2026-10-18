@@ -105,7 +105,7 @@ final class guard_integration_test extends \advanced_testcase {
         $this->assertFalse($pluginman->can_uninstall_plugin('mod_recuperacao'));
         $this->assertTrue($pluginman->can_uninstall_plugin('availability_recuperacao'));
         $this->assertEquals(
-            2026101700,
+            2026101707,
             $pluginman->get_plugin_info('availability_recuperacao')->dependencies['mod_recuperacao']
         );
     }

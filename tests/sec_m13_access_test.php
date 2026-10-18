@@ -176,8 +176,7 @@ final class sec_m13_access_test extends \advanced_testcase {
     /**
      * D3: no status other than exactly "sent" opens the activity, and the list agrees with is_eligible().
      *
-     * Trailing spaces are excluded from the strict list coherence on MySQL/MariaDB/SQL Server only: their binary
-     * collations pad spaces, so "sent " equals "sent" in SQL (finding S-05, low; is_eligible() still denies).
+     * Exact on every database, trailing spaces included (S-05 fixed by ADR-017a, mod_recuperacao >= 2026101705).
      */
     public function test_status_variants_never_open_and_lists_agree(): void {
         global $DB;
@@ -197,7 +196,6 @@ final class sec_m13_access_test extends \advanced_testcase {
             ]);
             $byvariant[$variant] = (int) $user->id;
         }
-        $padspace = in_array($DB->get_dbfamily(), ['mysql', 'mssql'], true);
         $contract = $this->contract_list((int) $this->round->id, (int) $this->target->cmid);
         $core = $this->core_list((int) $this->course->id, (int) $this->target->cmid);
 
@@ -208,14 +206,10 @@ final class sec_m13_access_test extends \advanced_testcase {
                 "is_eligible must deny $label"
             );
             $this->assertFalse($this->sees((int) $this->course->id, (int) $this->target->cmid, $userid), "visible $label");
-            if ($padspace && $variant === 'sent ') {
-                continue;
-            }
             $this->assertNotContains($userid, $contract, "contract list must not contain $label");
             $this->assertNotContains($userid, $core, "core list must not contain $label");
         }
-        $padded = $padspace ? [$byvariant['sent ']] : [];
-        $this->assertSame([$this->users[state_machine::STATUS_SENT]], array_values(array_diff($core, $padded)));
+        $this->assertSame([$this->users[state_machine::STATUS_SENT]], $core);
         $this->assertSame($core, $contract);
         $this->assertTrue($this->sees((int) $this->course->id, (int) $this->target->cmid, $this->users['sent']));
     }

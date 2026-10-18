@@ -22,12 +22,13 @@ use core_availability\info_module;
 use mod_recuperacao\local\access\target_access;
 
 /**
- * Restriction by recovery round: the activity is available only to students sent to the round.
+ * Restriction by recovery round: the activity is available only to the students the round gives access to.
  *
  * Server side only (M1.2). Stored as {"type":"recuperacao","id":<round instance id>}. The activity checked is the
  * course module carrying the condition, which must be the recovery activity of the round; the decision is
- * mod_recuperacao's access contract (target_access). Fail closed (ADR-014): a negated condition, a condition on a
- * section, a missing contract or round and any error mean "not available".
+ * mod_recuperacao's access contract (target_access): sent students and, as the round settings allowed when they
+ * were resolved, passed or failed students (ADR-022, ADR-022a). Fail closed (ADR-014): a negated condition, a
+ * condition on a section, a missing contract or round and any error mean "not available".
  *
  * @package    availability_recuperacao
  * @copyright  2026 OrangeBR

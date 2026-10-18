@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['description'] = 'Permitir apenas alunos enviados para a rodada de recuperação desta atividade.';
+$string['description'] = 'Permitir apenas os alunos a quem a rodada de recuperação dá acesso: os enviados e, conforme as opções da rodada, os aprovados ou reprovados.';
 $string['pluginname'] = 'Restrição por rodada de recuperação';
 $string['privacy:metadata'] = 'O plugin Restrição por rodada de recuperação não armazena dados pessoais.';
 $string['requires_notrecuperacao'] = 'Esta restrição não pode ser negada: ninguém obtém acesso por ela';
-$string['requires_recuperacao'] = 'Você foi enviado para recuperação nesta atividade';
+$string['requires_recuperacao'] = 'Disponível para os alunos da rodada de recuperação (enviados e, conforme as opções da rodada, aprovados ou reprovados)';
 $string['title'] = 'Rodada de recuperação';

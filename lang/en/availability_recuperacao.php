@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['description'] = 'Allow only students sent to the recovery round of this activity.';
+$string['description'] = 'Allow only the students the recovery round gives access to: those sent and, as the round settings allow, those who passed or failed.';
 $string['pluginname'] = 'Restriction by recovery round';
 $string['privacy:metadata'] = 'The Restriction by recovery round plugin does not store any personal data.';
 $string['requires_notrecuperacao'] = 'This restriction cannot be negated: nobody gets access through it';
-$string['requires_recuperacao'] = 'You have been sent to recovery in this activity';
+$string['requires_recuperacao'] = 'Available to students of the recovery round (sent, and passed or failed as the round settings allow)';
 $string['title'] = 'Recovery round';
