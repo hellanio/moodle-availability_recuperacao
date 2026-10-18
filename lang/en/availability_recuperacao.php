@@ -25,8 +25,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['description'] = 'Allow only the students the recovery round gives access to: those sent and, as the round settings allow, those who passed or failed.';
+$string['error_hidden'] = 'The restriction "Recovery round" must hide the activity entirely from students who do not meet it (eye closed).';
+$string['error_rootand'] = 'The restrictions must be combined with "Student must match all of the following", otherwise students who were not sent could open the activity.';
+$string['error_selectround'] = 'Choose the recovery round.';
+$string['error_toplevel'] = 'The restriction "Recovery round" must be at the top level, not inside a restriction set.';
+$string['error_unavailableround'] = 'This round does not use this activity as its recovery activity, so nobody gets access through this restriction. Choose a round in the list, or remove the restriction if no round uses this activity.';
 $string['pluginname'] = 'Restriction by recovery round';
 $string['privacy:metadata'] = 'The Restriction by recovery round plugin does not store any personal data.';
 $string['requires_notrecuperacao'] = 'This restriction cannot be negated: nobody gets access through it';
 $string['requires_recuperacao'] = 'Available to students of the recovery round (sent, and passed or failed as the round settings allow)';
 $string['title'] = 'Recovery round';
+$string['unavailableround'] = 'Round not available (#{$a})';

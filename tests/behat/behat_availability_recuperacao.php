@@ -18,9 +18,11 @@
 
 require_once(__DIR__ . '/../../../../../lib/behat/behat_base.php');
 
+use Behat\Mink\Exception\ExpectationException;
+
 /**
- * Steps of the recovery activity guard (M1.5): switch the condition plugin as Manage restrictions does, and submit a
- * restriction tree without the frontend (M1.4).
+ * Steps of the recovery activity guard (M1.5): switch the condition plugin as Manage restrictions does, submit a
+ * restriction tree without the frontend (M1.4), and check the tree saved by the editor (M1.4c).
  *
  * @package    availability_recuperacao
  * @copyright  2026 OrangeBR
@@ -59,5 +61,46 @@ class behat_availability_recuperacao extends behat_base {
         // browser without the frontend would submit it.
         $field = $this->find('css', '[name="availabilityconditionsjson"]');
         $field->setValue(json_encode($root));
+    }
+
+    /**
+     * Puts in the restrictions field of the open form the tree the editor builds for a round (root "and", the condition
+     * as its only child, eye closed), as a browser without JavaScript would submit it.
+     *
+     * @When /^I set the restrictions field to the editor tree of the recovery round "(?P<round_string>[^"]*)"$/
+     * @param string $roundidnumber Round idnumber.
+     * @return void
+     */
+    public function i_set_the_restrictions_to_the_editor_tree(string $roundidnumber): void {
+        global $DB;
+        $roundid = (int) $DB->get_field('course_modules', 'instance', ['idnumber' => $roundidnumber], MUST_EXIST);
+        $root = \core_availability\tree::get_root_json(
+            [\availability_recuperacao\condition::get_json($roundid)],
+            \core_availability\tree::OP_AND,
+            false
+        );
+        $this->find('css', '[name="availabilityconditionsjson"]')->setValue(json_encode($root));
+    }
+
+    /**
+     * Checks that the activity is restricted exactly as the editor saves the restriction "Recovery round": root "and",
+     * the condition of the round as its only child, eye closed (J2 of docs/M1_4_DESIGN.md §5).
+     *
+     * @Then /^the restrictions of "(?P<activity_string>[^"]*)" should be only the recovery round "(?P<round_string>[^"]*)" hidden$/
+     * @param string $activityidnumber Activity idnumber.
+     * @param string $roundidnumber Round idnumber.
+     * @return void
+     */
+    public function the_restrictions_should_be_only_the_round(string $activityidnumber, string $roundidnumber): void {
+        global $DB;
+        $roundid = (int) $DB->get_field('course_modules', 'instance', ['idnumber' => $roundidnumber], MUST_EXIST);
+        $saved = (string) $DB->get_field('course_modules', 'availability', ['idnumber' => $activityidnumber], MUST_EXIST);
+        $expected = ['op' => '&', 'c' => [['type' => 'recuperacao', 'id' => $roundid]], 'showc' => [false]];
+        if (json_decode($saved, true) !== $expected) {
+            throw new ExpectationException(
+                'Restrictions of "' . $activityidnumber . '" are ' . $saved . ', expected ' . json_encode($expected),
+                $this->getSession()
+            );
+        }
     }
 }
