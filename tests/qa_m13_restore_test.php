@@ -82,6 +82,9 @@ final class qa_m13_restore_test extends \advanced_testcase {
         $root = tree::get_root_json([condition::get_json((int) $this->round->id)], tree::OP_AND, false);
         $DB->set_field('course_modules', 'availability', json_encode($root), ['id' => $this->target->cmid]);
         rebuild_course_cache((int) $this->course->id, true);
+        // M1.4a (ADR-016): the round hid its unprotected activity; the tree written above has no event, so the guard
+        // is told here, as a save of the activity settings would.
+        \mod_recuperacao\local\target_guard::sync_cms([(int) $this->target->cmid]);
         foreach ([state_machine::STATUS_SENT, state_machine::STATUS_IDENTIFIED, 'none'] as $status) {
             $user = $generator->create_and_enrol($this->course, 'student');
             if ($status !== 'none') {

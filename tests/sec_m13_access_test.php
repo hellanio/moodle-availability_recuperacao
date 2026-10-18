@@ -87,6 +87,9 @@ final class sec_m13_access_test extends \advanced_testcase {
             'targetcmid' => $this->target->cmid,
         ]);
         $this->set_rec((int) $this->target->cmid, (int) $this->round->id);
+        // M1.4a (ADR-016): the round hid its unprotected activity; the tree written by set_rec() has no event, so the guard
+        // is told here, as a save of the activity settings would.
+        \mod_recuperacao\local\target_guard::sync_cms([(int) $this->target->cmid]);
         $statuses = [
             'none',
             state_machine::STATUS_IDENTIFIED,
