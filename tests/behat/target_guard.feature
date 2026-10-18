@@ -43,8 +43,10 @@ Feature: Recovery activity guard (M1.5) - the activity closes when its restricti
     And I am on the "rec" "page activity" page
     And I should not see "Conteudo guardado"
     And I am on the "Rodada guardada" "recuperacao activity" page logged in as "teacher1"
-    And I should see "The recovery activity is hidden from students by the access guard."
+    And I should see "Activity hidden: action needed" in the ".alert-danger .alert-heading" "css_element"
+    And I should see "The recovery activity is hidden from students." in the ".alert-danger" "css_element"
     And I should see "Reason: the restriction used by the round is disabled on this site."
+    And ".alert-danger[role='alert']" "css_element" should not exist
     And I am on the "rec" "page activity" page
     And I should see "Conteudo guardado"
     And the availability condition "recuperacao" is enabled
@@ -55,7 +57,8 @@ Feature: Recovery activity guard (M1.5) - the activity closes when its restricti
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade guardada"
     And I am on the "Rodada guardada" "recuperacao activity" page logged in as "teacher1"
-    And I should not see "The recovery activity is hidden from students by the access guard."
+    And I should not see "The recovery activity is hidden from students."
+    And I should not see "Activity hidden: action needed"
 
   Scenario: B2 - the server refuses a restriction tree that would open the recovery activity
     Given I am on the "rec" "page activity editing" page logged in as "teacher1"
