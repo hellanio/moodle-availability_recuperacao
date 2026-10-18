@@ -104,9 +104,12 @@ M.availability_recuperacao.form.getNode = function(json) {
     // The activity must be hidden entirely from who does not meet the restriction: the private rule closes and locks
     // every eye of the tree. Deferred so that the event bubbles to the root list (the item is not attached yet), then
     // the field is updated with the closed eyes.
+    // Until then the eye is not checked: the core updates the field once before the rule is set.
+    node.setData('privatePending', true);
     M.util.js_pending('availability_recuperacao_private');
     window.setTimeout(function() {
         node.fire('availability:privateRuleSet', {plugin: 'recuperacao'});
+        node.setData('privatePending', false);
         if (M.core_availability.form.rootList) {
             M.core_availability.form.update();
         }
@@ -139,31 +142,33 @@ M.availability_recuperacao.form.fillValue = function(value, node) {
  * @param {Y.Node} node Controls.
  */
 M.availability_recuperacao.form.fillErrors = function(errors, node) {
+    // The core writes on the item the last error of a check, and only when the item showed none: the error the
+    // teacher must act on first (the round) is pushed last.
+    var root = M.core_availability.form.rootList;
+    if (root) {
+        var item = null;
+        for (var i = 0; i < root.children.length; i++) {
+            if (root.children[i].pluginNode === node) {
+                item = root.children[i];
+            }
+        }
+        if (!item) {
+            errors.push('availability_recuperacao:error_toplevel');
+        }
+        if (root.getValue().op !== '&') {
+            errors.push('availability_recuperacao:error_rootand');
+        } else if (item && item.eyeIcon && !node.getData('privatePending') &&
+                !item.eyeIcon.isHidden() && !item.eyeIcon.isDisabled()) {
+            errors.push('availability_recuperacao:error_hidden');
+        }
+    }
+
     var value = {};
     this.fillValue(value, node);
     if (value.id === undefined) {
         errors.push('availability_recuperacao:error_selectround');
     } else if (!this.findRound(value.id)) {
         errors.push('availability_recuperacao:error_unavailableround');
-    }
-
-    var root = M.core_availability.form.rootList;
-    if (!root) {
-        return;
-    }
-    var item = null;
-    for (var i = 0; i < root.children.length; i++) {
-        if (root.children[i].pluginNode === node) {
-            item = root.children[i];
-        }
-    }
-    if (!item) {
-        errors.push('availability_recuperacao:error_toplevel');
-    }
-    if (root.getValue().op !== '&') {
-        errors.push('availability_recuperacao:error_rootand');
-    } else if (item && item.eyeIcon && !item.eyeIcon.isHidden() && !item.eyeIcon.isDisabled()) {
-        errors.push('availability_recuperacao:error_hidden');
     }
 };
 
