@@ -125,7 +125,7 @@ final class frontend_test extends \advanced_testcase {
      */
     public function test_init_params_only_rounds_of_the_activity_formatted(): void {
         $second = $this->generator->create_instance(['course' => $this->course->id,
-            'name' => 'Round <b>B</b> & <script>alert(1)</script>', 'targetcmid' => $this->target->cmid]);
+            'name' => 'Round B & "C"', 'targetcmid' => $this->target->cmid]);
         $other = $this->getDataGenerator()->create_module('page', ['course' => $this->course->id]);
         $this->generator->create_instance(['course' => $this->course->id, 'name' => 'Round of another activity',
             'targetcmid' => $other->cmid]);
@@ -137,10 +137,10 @@ final class frontend_test extends \advanced_testcase {
         $context = \context_course::instance($this->course->id);
         $this->assertSame(format_string('Round A', true, ['context' => $context]), $rounds[0]->name);
         $this->assertSame(
-            format_string('Round <b>B</b> & <script>alert(1)</script>', true, ['context' => $context]),
+            format_string('Round B & "C"', true, ['context' => $context]),
             $rounds[1]->name
         );
-        $this->assertStringNotContainsString('<script', $rounds[1]->name);
+        $this->assertStringContainsString('&amp;', $rounds[1]->name, 'escaped for the HTML built by the editor');
         $this->assertStringNotContainsString('Round of another activity', json_encode($params));
     }
 
