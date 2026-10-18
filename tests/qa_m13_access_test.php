@@ -66,6 +66,9 @@ final class qa_m13_access_test extends \advanced_testcase {
             'targetcmid' => $this->target->cmid,
         ]);
         $this->restrict((int) $this->target->cmid, (int) $this->round->id);
+        // M1.CI (ADR-021): the round hid its unprotected activity; the tree written above has no event, so the guard
+        // is told here, as a save of the activity settings would.
+        \mod_recuperacao\local\target_guard::sync_cms([(int) $this->target->cmid]);
     }
 
     /**
@@ -247,8 +250,10 @@ final class qa_m13_access_test extends \advanced_testcase {
         foreach ([1, 30] as $n) {
             $course = $this->getDataGenerator()->create_course();
             $user = $this->getDataGenerator()->create_and_enrol($course, 'student');
+            $targets = [];
             for ($i = 0; $i < $n; $i++) {
                 $target = $this->getDataGenerator()->create_module('page', ['course' => $course->id]);
+                $targets[] = (int) $target->cmid;
                 $round = $this->generator->create_instance(['course' => $course->id, 'targetcmid' => $target->cmid]);
                 $this->generator->create_case([
                     'recuperacaoid' => $round->id,
@@ -258,6 +263,8 @@ final class qa_m13_access_test extends \advanced_testcase {
                 $root = tree::get_root_json([condition::get_json((int) $round->id)], tree::OP_AND, false);
                 $DB->set_field('course_modules', 'availability', json_encode($root), ['id' => $target->cmid]);
             }
+            // M1.CI (ADR-021): the trees above have no event; the guard is told, as a save of the settings would.
+            \mod_recuperacao\local\target_guard::sync_cms($targets);
             rebuild_course_cache((int) $course->id, true);
             // First read after the course cache rebuild ("with", contexts cold), then the same page again ("warm").
             foreach (['with' => true, 'warm' => true, 'coredate' => false, 'without' => false] as $label => $restricted) {

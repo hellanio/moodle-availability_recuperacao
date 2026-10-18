@@ -89,6 +89,10 @@ final class sec_m1_condition_test extends \advanced_testcase {
         // The identified student is also in the sibling group (to test OR composition).
         $this->getDataGenerator()->create_group_member(['groupid' => $this->group->id,
             'userid' => $this->users[state_machine::STATUS_IDENTIFIED]]);
+        // M1.CI (ADR-021): the round hid its unprotected activity. The tests write their trees without an event, so
+        // the guard is told once here about the canonical tree, as a save of the activity settings would.
+        $this->set_availability($this->tree('and'));
+        \mod_recuperacao\local\target_guard::sync_cms([(int) $this->target->cmid]);
     }
 
     /**

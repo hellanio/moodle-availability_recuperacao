@@ -75,6 +75,9 @@ final class condition_test extends \advanced_testcase {
             'targetcmid' => $this->target->cmid,
         ]);
         $this->restrict((int) $this->target->cmid, (int) $this->round->id);
+        // M1.CI (ADR-021): the round hid its unprotected activity; the tree written above has no event, so the guard
+        // is told here, as a save of the activity settings would.
+        \mod_recuperacao\local\target_guard::sync_cms([(int) $this->target->cmid]);
     }
 
     /**

@@ -74,6 +74,9 @@ final class qa_m1_condition_test extends \advanced_testcase {
         ]);
         $this->manual = $DB->get_record('enrol', ['courseid' => $this->course->id, 'enrol' => 'manual'], '*', MUST_EXIST);
         $this->restrict((object) tree::get_root_json([condition::get_json((int) $this->round->id)], tree::OP_AND, false));
+        // M1.CI (ADR-021): the round hid its unprotected activity; the tree written above has no event, so the guard
+        // is told here, as a save of the activity settings would.
+        \mod_recuperacao\local\target_guard::sync_cms([(int) $this->target->cmid]);
     }
 
     /**
