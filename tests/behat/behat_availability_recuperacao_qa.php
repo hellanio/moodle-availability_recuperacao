@@ -42,5 +42,9 @@ class behat_availability_recuperacao_qa extends behat_base {
         $root = \core_availability\tree::get_root_json([$condition], \core_availability\tree::OP_AND, false);
         $DB->set_field('course_modules', 'availability', json_encode($root), ['id' => $cmid]);
         rebuild_course_cache((int) $round->course, true);
+        // As a save of the activity settings: the guard is told (M1.4a hides a recovery activity until it is
+        // protected; without this the sent student never saw it, M1.4c loop 1).
+        \mod_recuperacao\local\target_guard::sync_cms([$cmid]);
+        \course_modinfo::clear_instance_cache((int) $round->course);
     }
 }
