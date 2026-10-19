@@ -147,4 +147,39 @@ JS;
             throw new ExpectationException('Restriction "Recovery round": ' . $problems, $this->getSession());
         }
     }
+
+    /**
+     * Checks that the restriction "Recovery round", with its list of rounds, fits in the width of the window and the
+     * page does not scroll sideways (WCAG 1.4.10, UX-4C-14).
+     *
+     * @Then /^the restriction "Recovery round" should fit in the window width without horizontal scrolling$/
+     * @return void
+     */
+    public function the_restriction_should_fit_without_horizontal_scrolling(): void {
+        $script = <<<'JS'
+(function() {
+    var width = document.documentElement.clientWidth;
+    var problems = [];
+    if (document.documentElement.scrollWidth > width + 1) {
+        problems.push('page scrolls sideways (' + document.documentElement.scrollWidth + ' > ' + width + ')');
+    }
+    var parts = document.querySelectorAll('.availability_recuperacao, .availability_recuperacao label, ' +
+        '.availability_recuperacao select');
+    if (!document.querySelector('.availability_recuperacao select')) {
+        problems.push('no list of rounds');
+    }
+    parts.forEach(function(part) {
+        var right = part.getBoundingClientRect().right;
+        if (right > width + 1) {
+            problems.push(part.tagName.toLowerCase() + ' beyond the window (' + Math.round(right) + ')');
+        }
+    });
+    return problems.join('; ');
+})()
+JS;
+        $problems = (string) $this->evaluate_script($script);
+        if ($problems !== '') {
+            throw new ExpectationException('Restriction "Recovery round": ' . $problems, $this->getSession());
+        }
+    }
 }

@@ -17,6 +17,16 @@
     overflow-wrap: anywhere;
 }
 
+/* List of rounds (two or more rounds, or an unavailable one): the label is a flex item, so it must be allowed to shrink
+   below the width of the longest option. A percentage width also takes the select out of the minimum width of the
+   form field, which otherwise grows past the window; no horizontal scroll at 320 px (WCAG 1.4.10, UX-4C-14). The
+   select is a block below the title, so it only fills the label. The path with one round has no label. */
+.availability_recuperacao > label {
+    min-width: 0;
+    max-width: 100%;
+}
+
 .availability_recuperacao select {
+    width: 100%;
     max-width: 100%;
 }

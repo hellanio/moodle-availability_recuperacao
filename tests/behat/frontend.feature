@@ -188,6 +188,34 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     And the restriction "Recovery round" should show its error within the window width
     And the "Restringir acesso" "fieldset" should meet "wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa" accessibility standards
 
+  @javascript @accessibility
+  Scenario: J6b - at 320 pixels, a list of two rounds with long names fits the window (WCAG 1.4.10, UX-4C-14)
+    Given the following "activities" exist:
+      | activity    | name                                                               | course | idnumber |
+      | recuperacao | Rodada de recuperacao do segundo bimestre de matematica II turma A | C1     | round3   |
+      | recuperacao | Rodada de recuperacao do segundo bimestre de matematica II turma B | C1     | round4   |
+    And the recovery activity of "Rodada de recuperacao do segundo bimestre de matematica II turma A" is "Atividade livre"
+    And the recovery activity of "Rodada de recuperacao do segundo bimestre de matematica II turma B" is "Atividade livre"
+    And I change viewport size to "320x800"
+    And I am on the "free" "page activity editing" page logged in as "profpt"
+    And I expand all fieldsets
+    When I click on "Adicionar restrição..." "button"
+    And I click on "Rodada de recuperação" "button" in the "Adicionar restrição..." "dialogue"
+    Then I should see "Escolha a rodada" in the "Restringir acesso" "fieldset"
+    And the restriction "Recovery round" should fit in the window width without horizontal scrolling
+    And the "Restringir acesso" "fieldset" should meet "wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa" accessibility standards
+
+  @javascript @accessibility
+  Scenario: J6c - at 320 pixels, an unavailable round in the list fits the window (WCAG 1.4.10, UX-4C-14)
+    Given the activity "free" is restricted by the recovery round "round1" and hidden
+    And I change viewport size to "320x800"
+    And I am on the "free" "page activity editing" page logged in as "profpt"
+    And I expand all fieldsets
+    Then I should see "Rodada indisponível" in the "Restringir acesso" "fieldset"
+    And the restriction "Recovery round" should fit in the window width without horizontal scrolling
+    And the restriction "Recovery round" should show its error within the window width
+    And the "Restringir acesso" "fieldset" should meet "wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa" accessibility standards
+
   @javascript
   Scenario: J5 - a restriction naming a round that does not use the activity is shown as unavailable
     Given the activity "free" is restricted by the recovery round "round1" and hidden
