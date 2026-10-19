@@ -67,10 +67,12 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     And I should see "Always hidden entirely from students without access, so the eye stays closed." in the "Restrict access" "fieldset"
     And I press "Save and return to course"
     And the restrictions of "rec" should be only the recovery round "round1" hidden
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "ana"
     And I should see "Atividade alvo"
     And I am on the "rec" "page activity" page
     And I should see "Conteudo do alvo"
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade alvo"
     And I am on the "rec" "page activity" page
@@ -108,6 +110,7 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     And I press "Save and return to course"
     And I should see "Move it out of the restriction set."
     And the restrictions of "rec" should be only the recovery round "round1" hidden
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade alvo"
 
@@ -121,6 +124,7 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     And I press "Save and return to course"
     And I should see "needs the restriction \"Recovery round\""
     And the restrictions of "rec" should be only the recovery round "round1" hidden
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade alvo"
 
@@ -246,8 +250,10 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     When I set the restrictions field to the editor tree of the recovery round "round1"
     And I press "Save and return to course"
     Then the restrictions of "rec" should be only the recovery round "round1" hidden
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "ana"
     And I should see "Atividade alvo"
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade alvo"
     And I am on the "rec" "page activity" page

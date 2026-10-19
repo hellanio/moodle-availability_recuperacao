@@ -67,3 +67,28 @@ Feature: Recovery activity guard (M1.5) - the activity closes when its restricti
     Then I should see "must be at the top level, joined with"
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade guardada"
+
+  # SEC-M1Z-01 (ADR-036): the core sends a stealth activity, name and link, to every student; the guard hides it.
+  Scenario: B3 - made available but not shown on the course page, the activity is hidden and the teacher is told
+    Given the following config values are set as admin:
+      | allowstealth | 1 |
+    And I am on the "rec" "page activity editing" page logged in as "teacher1"
+    When I set the field "Availability" to "Make available but don't show on course page"
+    And I press "Save and return to course"
+    Then I should see "\"Atividade guardada\" was hidden from students: it is a recovery activity"
+    And I am on the "Rodada guardada" "recuperacao activity" page
+    And I should see "Activity hidden: action needed" in the ".alert-danger .alert-heading" "css_element"
+    And I should see "Reason: the activity is available but not shown on the course page" in the ".alert-danger" "css_element"
+    And I should see "show the activity on the course page, in a section that is shown" in the ".alert-danger" "css_element"
+    And I am on the "rec" "page activity" page logged in as "ana"
+    And I should not see "Conteudo guardado"
+    And I am on the "rec" "page activity editing" page logged in as "teacher1"
+    And I set the field "Availability" to "Show on course page"
+    And I press "Save and return to course"
+    And I should not see "was hidden from students"
+    And I am on the "Rodada guardada" "recuperacao activity" page
+    And I should not see "The recovery activity is hidden from students."
+    And I am on the "rec" "page activity" page logged in as "ana"
+    And I should see "Conteudo guardado"
+    And I am on the "C1" "Course" page logged in as "bruno"
+    And I should not see "Atividade guardada"

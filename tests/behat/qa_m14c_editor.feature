@@ -60,12 +60,15 @@ Feature: QA M1.4c - editor of the restriction "Recovery round" beyond J1-J5
     And I press "Save and return to course"
     And I should not see "needs the restriction \"Recovery round\""
     And the restrictions of "rec" should be only the recovery round "round1" hidden
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "ana"
     And I should see "Atividade alvo"
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade alvo"
     And I am on the "rec" "page activity" page
     And I should not see "Conteudo do alvo"
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "carla"
     And I should not see "Atividade alvo"
 
@@ -86,10 +89,13 @@ Feature: QA M1.4c - editor of the restriction "Recovery round" beyond J1-J5
     And I should not see "Choose the recovery round" in the "Restrict access" "fieldset"
     And I press "Save and return to course"
     And the restrictions of "rec" should be only the recovery round "round2" hidden
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "carla"
     And I should see "Atividade alvo"
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "ana"
     And I should not see "Atividade alvo"
+    And I clear the browser session storage
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade alvo"
 
