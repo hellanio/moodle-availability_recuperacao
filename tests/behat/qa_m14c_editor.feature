@@ -172,7 +172,7 @@ Feature: QA M1.4c - editor of the restriction "Recovery round" beyond J1-J5
     And I click on "Rodada de recuperação" "button" in the "Adicionar restrição..." "dialogue"
     And I should see "Tire-a do grupo de restrição." in the ".availability-children .availability-list" "css_element"
     And I press "Salvar e voltar ao curso"
-    And I should see "deve ficar no nível principal"
+    And I should see "Tire-a do grupo de restrição."
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on "Curso 1" course homepage
     And I should see "Você é aluno da rodada de recuperação" in the "Atividade alvo" "activity"
