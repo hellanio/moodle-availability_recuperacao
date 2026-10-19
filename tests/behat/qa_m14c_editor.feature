@@ -54,11 +54,11 @@ Feature: QA M1.4c - editor of the restriction "Recovery round" beyond J1-J5
     Then I should see "Rodada do alvo" in the "Restrict access" "fieldset"
     And ".availability-children .availability-eye-disabled" "css_element" should be visible
     And ".availability-children .availability-eye" "css_element" should not be visible
-    And I should not see "must hide the activity entirely" in the "Restrict access" "fieldset"
+    And I should not see "The eye must stay closed." in the "Restrict access" "fieldset"
     And I should not see "Choose the recovery round" in the "Restrict access" "fieldset"
     And I should not see "Round not available" in the "Restrict access" "fieldset"
     And I press "Save and return to course"
-    And I should not see "cannot be removed"
+    And I should not see "needs the restriction \"Recovery round\""
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on the "C1" "Course" page logged in as "ana"
     And I should see "Atividade alvo"
@@ -104,7 +104,7 @@ Feature: QA M1.4c - editor of the restriction "Recovery round" beyond J1-J5
     And I set the field "direction" to "from"
     And I set the field "x[year]" to "2020"
     Then ".availability-children .availability-eye" "css_element" should not be visible
-    And I should not see "must hide the activity entirely" in the "Restrict access" "fieldset"
+    And I should not see "The eye must stay closed." in the "Restrict access" "fieldset"
     And I press "Save and return to course"
     And the restrictions of "rec" should join 2 conditions with the recovery round "round1" all hidden
     And I am on the "C1" "Course" page logged in as "ana"
@@ -132,7 +132,7 @@ Feature: QA M1.4c - editor of the restriction "Recovery round" beyond J1-J5
     And I click on "Add restriction..." "button"
     And I click on "Date" "button" in the "Add restriction..." "dialogue"
     And I press "Save and return to course"
-    Then I should see "the restriction \"Recovery round\" cannot be removed"
+    Then I should see "needs the restriction \"Recovery round\""
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on the "rec" "page activity editing" page
     And I expand all fieldsets
@@ -140,7 +140,7 @@ Feature: QA M1.4c - editor of the restriction "Recovery round" beyond J1-J5
     And I click on "Add restriction..." "button"
     And I click on "Recovery round" "button" in the "Add restriction..." "dialogue"
     And I press "Save and return to course"
-    And I should not see "cannot be removed"
+    And I should not see "needs the restriction \"Recovery round\""
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade alvo"
@@ -162,7 +162,7 @@ Feature: QA M1.4c - editor of the restriction "Recovery round" beyond J1-J5
     And I should see "Rodada do alvo" in the "Restringir acesso" "fieldset"
     When I click on ".availability-item .availability-delete img" "css_element"
     And I press "Salvar e voltar ao curso"
-    Then I should see "a restrição \"Rodada de recuperação\" não pode ser removida"
+    Then I should see "precisa da restrição \"Rodada de recuperação\""
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on the "rec" "page activity editing" page
     And I expand all fieldsets
@@ -170,7 +170,7 @@ Feature: QA M1.4c - editor of the restriction "Recovery round" beyond J1-J5
     And I click on "Grupo de restrição" "button" in the "Adicionar restrição..." "dialogue"
     And I click on "Adicionar restrição..." "button" in the ".availability-children .availability-list" "css_element"
     And I click on "Rodada de recuperação" "button" in the "Adicionar restrição..." "dialogue"
-    And I should see "deve ficar no nível principal, fora de um grupo de restrição" in the ".availability-children .availability-list" "css_element"
+    And I should see "Tire-a do grupo de restrição." in the ".availability-children .availability-list" "css_element"
     And I press "Salvar e voltar ao curso"
     And I should see "deve ficar no nível principal"
     And the restrictions of "rec" should be only the recovery round "round1" hidden
