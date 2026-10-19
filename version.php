@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'availability_recuperacao';
-$plugin->version   = 2026101708;
+$plugin->version   = 2026101709;
 $plugin->release   = '0.3.0';
 $plugin->requires  = 2025100600; // Moodle 5.1 (ADR-013).
 $plugin->supported = [501, 502];

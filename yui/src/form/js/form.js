@@ -87,10 +87,16 @@ M.availability_recuperacao.form.getNode = function(json) {
         }
         html += '</select></span></label>';
     }
+    // Visible text, not only the title of the locked eye (which is aria-hidden and cannot be focused): why the eye is
+    // closed, in the words of the teacher (UX-4C-04). The list of rounds is described by it.
+    var noteid = Y.guid('availability-recuperacao-hiddennote-');
+    html += '<small class="availability-recuperacao-hiddennote text-muted w-100" id="' + noteid + '">' +
+            M.util.get_string('hiddennote', 'availability_recuperacao') + '</small>';
     var node = Y.Node.create('<span class="d-flex flex-wrap align-items-center">' + html + '</span>');
 
     var select = node.one('select[name=id]');
     if (select) {
+        select.setAttribute('aria-describedby', noteid);
         if (!isNaN(stored)) {
             select.set('value', '' + stored);
         }
@@ -141,7 +147,16 @@ M.availability_recuperacao.form.fillValue = function(value, node) {
  */
 M.availability_recuperacao.form.fillErrors = function(errors, node) {
     // The core writes on the item the last error of a check, and only when the item showed none: the error the
-    // teacher must act on first (the round) is pushed last.
+    // teacher must act on first (the round) is pushed last. The marker of this item is emptied first, so that the
+    // core writes the error of this check, not leave the one of an earlier check (UX-4C-02).
+    var itemnode = node.get('parentNode');
+    if (itemnode) {
+        itemnode.get('children').each(function(child) {
+            if (child.hasClass('badge')) {
+                child.setHTML('');
+            }
+        });
+    }
     var root = M.core_availability.form.rootList;
     if (root) {
         var item = null;

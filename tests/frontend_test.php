@@ -150,6 +150,7 @@ final class frontend_test extends \advanced_testcase {
     public function test_javascript_strings_exist(): void {
         $identifiers = $this->call('get_javascript_strings');
         $this->assertNotEmpty($identifiers);
+        $this->assertContains('hiddennote', $identifiers, 'the locked eye is explained in visible text (UX-4C-04)');
         $sm = get_string_manager();
         foreach (array_merge($identifiers, ['title', 'description']) as $identifier) {
             $this->assertTrue($sm->string_exists($identifier, 'availability_recuperacao'), $identifier);

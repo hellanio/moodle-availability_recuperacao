@@ -63,7 +63,8 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     And ".availability-children .availability-eye-disabled" "css_element" should be visible
     And ".availability-children .availability-eye" "css_element" should not be visible
     And I should not see "Choose the recovery round" in the "Restrict access" "fieldset"
-    And I should not see "must hide the activity entirely" in the "Restrict access" "fieldset"
+    And I should not see "The eye must stay closed." in the "Restrict access" "fieldset"
+    And I should see "Always hidden entirely from students without access, so the eye stays closed." in the "Restrict access" "fieldset"
     And I press "Save and return to course"
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on the "C1" "Course" page logged in as "ana"
@@ -83,19 +84,19 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     And I should see "Rodada do alvo" in the "Restrict access" "fieldset"
     And ".availability-children .availability-eye-disabled" "css_element" should be visible
     When I set the field "Restriction type" to "must not"
-    Then I should see "The restrictions must be combined with \"Student must match all of the following\"" in the "Restrict access" "fieldset"
+    Then I should see "Use \"must\" and \"all\" at the top." in the "Restrict access" "fieldset"
     And I press "Save and return to course"
     And I should see "must be at the top level, joined with \"must\" (all of)"
-    And I should see "The restrictions must be combined with \"Student must match all of the following\""
+    And I should see "Use \"must\" and \"all\" at the top."
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on the "rec" "page activity editing" page
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Date" "button" in the "Add restriction..." "dialogue"
     And I set the field "Required restrictions" to "any"
-    And I should see "The restrictions must be combined with \"Student must match all of the following\"" in the "Restrict access" "fieldset"
+    And I should see "Use \"must\" and \"all\" at the top." in the "Restrict access" "fieldset"
     And I press "Save and return to course"
-    And I should see "The restrictions must be combined with \"Student must match all of the following\""
+    And I should see "Use \"must\" and \"all\" at the top."
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on the "rec" "page activity editing" page
     And I expand all fieldsets
@@ -103,9 +104,9 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     And I click on "Restriction set" "button" in the "Add restriction..." "dialogue"
     And I click on "Add restriction..." "button" in the ".availability-children .availability-list" "css_element"
     And I click on "Recovery round" "button" in the "Add restriction..." "dialogue"
-    And I should see "must be at the top level, not inside a restriction set" in the ".availability-children .availability-list" "css_element"
+    And I should see "Move it out of the restriction set." in the ".availability-children .availability-list" "css_element"
     And I press "Save and return to course"
-    And I should see "must be at the top level, not inside a restriction set"
+    And I should see "Move it out of the restriction set."
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade alvo"
@@ -118,7 +119,7 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     When I click on ".availability-item .availability-delete img" "css_element"
     Then I should not see "Rodada do alvo" in the "Restrict access" "fieldset"
     And I press "Save and return to course"
-    And I should see "the restriction \"Recovery round\" cannot be removed"
+    And I should see "needs the restriction \"Recovery round\""
     And the restrictions of "rec" should be only the recovery round "round1" hidden
     And I am on the "C1" "Course" page logged in as "bruno"
     And I should not see "Atividade alvo"
@@ -143,14 +144,59 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     And the restrictions of "rec" should be only the recovery round "round1" hidden
 
   @javascript
+  Scenario: J3 with two rounds - choosing the round after "must not" shows the error of the tree, not the stale one
+    Given the following "activities" exist:
+      | activity    | name             | course | idnumber |
+      | recuperacao | Segunda rodada   | C1     | round2   |
+    And the recovery activity of "Segunda rodada" is "Atividade alvo"
+    And I am on the "rec" "page activity editing" page logged in as "teacher1"
+    And I expand all fieldsets
+    When I click on "Add restriction..." "button"
+    And I click on "Recovery round" "button" in the "Add restriction..." "dialogue"
+    And I should see "Choose the recovery round." in the "Restrict access" "fieldset"
+    And I set the field "Restriction type" to "must not"
+    And I should see "Choose the recovery round." in the "Restrict access" "fieldset"
+    And I set the field "Recovery round" to "Segunda rodada"
+    Then I should see "Use \"must\" and \"all\" at the top." in the "Restrict access" "fieldset"
+    And I should not see "Choose the recovery round." in the "Restrict access" "fieldset"
+    And I set the field "Restriction type" to "must"
+    And I should not see "Use \"must\" and \"all\" at the top." in the "Restrict access" "fieldset"
+    And I press "Save and return to course"
+    And the restrictions of "rec" should be only the recovery round "round2" hidden
+
+  @javascript @accessibility
+  Scenario: J6 - at 320 pixels, the error of the restriction wraps and the round is not cut (WCAG 1.4.10)
+    Given the following "activities" exist:
+      | activity    | name                                                        | course | idnumber |
+      | recuperacao | Rodada de recuperacao do segundo bimestre de matematica II | C1     | round3   |
+    And the recovery activity of "Rodada de recuperacao do segundo bimestre de matematica II" is "Atividade livre"
+    And I change viewport size to "320x800"
+    And I am on the "free" "page activity editing" page logged in as "profpt"
+    And I expand all fieldsets
+    When I click on "Adicionar restrição..." "button"
+    And I click on "Rodada de recuperação" "button" in the "Adicionar restrição..." "dialogue"
+    And I set the field "Tipo de restrição" to "não deve"
+    Then I should see "Use \"deve\" e \"tudo\" no topo." in the "Restringir acesso" "fieldset"
+    And I should see "Sempre oculta por completo para os alunos sem acesso, por isso o olho fica fechado." in the "Restringir acesso" "fieldset"
+    And the restriction "Recovery round" should show its error within the window width
+    And I set the field "Tipo de restrição" to "deve"
+    And I click on "Adicionar restrição..." "button"
+    And I click on "Grupo de restrição" "button" in the "Adicionar restrição..." "dialogue"
+    And I click on "Adicionar restrição..." "button" in the ".availability-children .availability-list" "css_element"
+    And I click on "Rodada de recuperação" "button" in the "Adicionar restrição..." "dialogue"
+    And I should see "Tire-a do grupo de restrição." in the ".availability-children .availability-list" "css_element"
+    And the restriction "Recovery round" should show its error within the window width
+    And the "Restringir acesso" "fieldset" should meet "wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa" accessibility standards
+
+  @javascript
   Scenario: J5 - a restriction naming a round that does not use the activity is shown as unavailable
     Given the activity "free" is restricted by the recovery round "round1" and hidden
     And I am on the "free" "page activity editing" page logged in as "teacher1"
     And I expand all fieldsets
     Then I should see "Round not available" in the "Restrict access" "fieldset"
-    And I should see "This round does not use this activity as its recovery activity" in the "Restrict access" "fieldset"
+    And I should see "This round does not use this activity: choose another." in the "Restrict access" "fieldset"
     And I press "Save and return to course"
-    And I should see "This round does not use this activity as its recovery activity"
+    And I should see "This round does not use this activity: choose another."
 
   @javascript
   Scenario: J2/J3 in Brazilian Portuguese - the teacher adds the restriction and is warned about "must not"
@@ -161,9 +207,9 @@ Feature: Editor of the restriction "Recovery round" (M1.4c)
     Then I should see "Rodada do alvo" in the "Restringir acesso" "fieldset"
     And ".availability-children .availability-eye-disabled" "css_element" should be visible
     And I set the field "Tipo de restrição" to "não deve"
-    And I should see "As restrições devem ser combinadas com \"Estudante deve combinar tudo do seguinte\"" in the "Restringir acesso" "fieldset"
+    And I should see "Use \"deve\" e \"tudo\" no topo." in the "Restringir acesso" "fieldset"
     And I set the field "Tipo de restrição" to "deve"
-    And I should not see "As restrições devem ser combinadas" in the "Restringir acesso" "fieldset"
+    And I should not see "Use \"deve\" e \"tudo\" no topo." in the "Restringir acesso" "fieldset"
     And I press "Salvar e voltar ao curso"
     And the restrictions of "rec" should be only the recovery round "round1" hidden
 

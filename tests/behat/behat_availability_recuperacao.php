@@ -103,4 +103,48 @@ class behat_availability_recuperacao extends behat_base {
             );
         }
     }
+
+    /**
+     * Checks that the error shown on the restriction "Recovery round", its round and its note fit in the width of the
+     * window, the error wrapping instead of running off the form (WCAG 1.4.10, UX-4C-01).
+     *
+     * @Then /^the restriction "Recovery round" should show its error within the window width$/
+     * @return void
+     */
+    public function the_restriction_should_show_its_error_within_the_window(): void {
+        $script = <<<'JS'
+(function() {
+    var width = document.documentElement.clientWidth;
+    var problems = [];
+    var badges = document.querySelectorAll('.availability-item .availability_recuperacao ~ .badge');
+    var shown = 0;
+    badges.forEach(function(badge) {
+        if (!badge.textContent.trim()) {
+            return;
+        }
+        shown++;
+        if (window.getComputedStyle(badge).whiteSpace === 'nowrap') {
+            problems.push('error does not wrap');
+        }
+        if (badge.scrollWidth > badge.clientWidth + 1) {
+            problems.push('error is cut');
+        }
+    });
+    if (!shown) {
+        problems.push('no error shown');
+    }
+    var parts = '.availability_recuperacao ~ .badge, .availability-recuperacao-round, .availability-recuperacao-hiddennote';
+    document.querySelectorAll(parts).forEach(function(part) {
+        if (part.textContent.trim() && part.getBoundingClientRect().right > width + 1) {
+            problems.push(part.className + ' beyond the window');
+        }
+    });
+    return problems.join('; ');
+})()
+JS;
+        $problems = (string) $this->evaluate_script($script);
+        if ($problems !== '') {
+            throw new ExpectationException('Restriction "Recovery round": ' . $problems, $this->getSession());
+        }
+    }
 }

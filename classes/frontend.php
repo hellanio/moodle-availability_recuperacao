@@ -47,6 +47,7 @@ class frontend extends \core_availability\frontend {
             'error_selectround',
             'error_toplevel',
             'error_unavailableround',
+            'hiddennote',
             'unavailableround',
         ];
     }
