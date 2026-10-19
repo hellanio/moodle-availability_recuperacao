@@ -25,12 +25,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'availability_recuperacao';
-$plugin->version   = 2026101710;
+$plugin->version   = 2026101711;
 $plugin->release   = '0.3.0';
 $plugin->requires  = 2025100600; // Moodle 5.1 (ADR-013).
 $plugin->supported = [501, 502];
 $plugin->maturity  = MATURITY_ALPHA;
 // The access contract is mod_recuperacao\local\access\target_access, and its guard is mod_recuperacao\local\target_guard
 // (install and uninstall callbacks, M1.5); the condition fails closed without them. The editor (M1.4c) reads the
-// rounds of an activity through target_access::rounds_for_target(), new in mod_recuperacao 2026101708 (ADR-018).
-$plugin->dependencies = ['mod_recuperacao' => 2026101708];
+// rounds of an activity through target_access::rounds_for_target(), new in mod_recuperacao 2026101708 (ADR-018). The
+// Behat features use the step "I clear the browser session storage" of mod_recuperacao 2026101710 (M1.Z2, QA-M1Z2-04).
+$plugin->dependencies = ['mod_recuperacao' => 2026101710];
