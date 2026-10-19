@@ -171,6 +171,19 @@ final class qa_m13_restore_test extends \advanced_testcase {
     }
 
     /**
+     * An activity closed by its round (M5.1, ADR-035 P3, QA-M51-01): hidden, without any recuperacao condition.
+     *
+     * @param int $cmid Course module.
+     * @return void
+     */
+    private function assert_closed_without_condition(int $cmid): void {
+        global $DB;
+        $this->assertSame(0, (int) $DB->get_field('course_modules', 'visible', ['id' => $cmid]));
+        $json = (string) $DB->get_field('course_modules', 'availability', ['id' => $cmid]);
+        $this->assertStringNotContainsString('"recuperacao"', $json);
+    }
+
+    /**
      * Course duplicated through the web service function, with and without users: the copy points to its own round;
      * without users nobody opens it, with users only the student sent (enrolments come with the users).
      */
@@ -236,8 +249,9 @@ final class qa_m13_restore_test extends \advanced_testcase {
 
     /**
      * Round deleted to the recycle bin: the recovery activity closes for everybody at once (async deletion in
-     * progress) and stays closed after the deletion and after the round is restored from the bin (the condition
-     * keeps the id of the deleted round; the restored round has a new id and no recovery activity).
+     * progress) and stays closed after the deletion and after the round is restored from the bin (since M5.1 the
+     * deletion hides it and removes the condition of the round, ADR-035 P3, QA-M51-01; the restored round has a new id
+     * and no recovery activity).
      */
     public function test_recyclebin_delete_and_restore_round(): void {
         global $DB;
@@ -254,7 +268,7 @@ final class qa_m13_restore_test extends \advanced_testcase {
         $this->runAdhocTasks('\core_course\task\course_delete_modules');
         $this->assertFalse($DB->record_exists('recuperacao', ['id' => $this->round->id]));
         $this->setUser(null);
-        $this->assertSame([(int) $this->round->id], $this->condition_ids((int) $this->target->cmid));
+        $this->assert_closed_without_condition((int) $this->target->cmid);
         foreach ($this->users as $userid) {
             $this->assertFalse($this->sees((int) $this->course->id, (int) $this->target->cmid, $userid));
         }
@@ -268,7 +282,7 @@ final class qa_m13_restore_test extends \advanced_testcase {
         $newround = $DB->get_record('recuperacao', ['course' => $this->course->id], '*', MUST_EXIST);
         $this->assertNotEquals((int) $this->round->id, (int) $newround->id);
         $this->assertEmpty($newround->targetcmid);
-        $this->assertSame([(int) $this->round->id], $this->condition_ids((int) $this->target->cmid));
+        $this->assert_closed_without_condition((int) $this->target->cmid);
         foreach ($this->users as $userid) {
             $this->assertFalse($this->sees((int) $this->course->id, (int) $this->target->cmid, $userid));
         }

@@ -165,8 +165,9 @@ final class qa_m13_access_test extends \advanced_testcase {
         );
         $this->setUser(null);
 
-        $this->assertFalse($this->available((int) $this->target->cmid, $sent));
-        $this->assertSame([[], []], $this->lists((int) $this->target->cmid));
+        // Since M5.1 (ADR-035 P3, QA-M51-01) the old activity is closed by hiding it, its condition of the round
+        // removed: no student reaches it, by its visibility.
+        $this->assert_hidden_without_condition((int) $this->target->cmid, $sent);
         // The new activity also gets the legacy managed group restriction (attach_access), so only the contract is
         // checked for it here.
         $this->assertTrue(target_access::is_eligible((int) $this->round->id, $sent, (int) $other->cmid));
@@ -213,8 +214,25 @@ final class qa_m13_access_test extends \advanced_testcase {
         $this->setAdminUser();
         $this->runAdhocTasks('\core_course\task\course_delete_modules');
         $this->setUser(null);
-        $this->assertFalse($this->available($cmid, $sent));
-        $this->assertSame([[], []], $this->lists($cmid));
+        // Deleted for good: closed by hiding, the condition of the round removed (M5.1, ADR-035 P3, QA-M51-01).
+        $this->assert_hidden_without_condition($cmid, $sent);
+    }
+
+    /**
+     * An activity closed by its round (M5.1, ADR-035 P3, QA-M51-01): hidden, without the recuperacao condition, and
+     * the student sent does not reach it.
+     *
+     * @param int $cmid Course module.
+     * @param int $sent Student sent.
+     * @return void
+     */
+    private function assert_hidden_without_condition(int $cmid, int $sent): void {
+        global $DB;
+        $this->assertSame(0, (int) $DB->get_field('course_modules', 'visible', ['id' => $cmid]));
+        $json = (string) $DB->get_field('course_modules', 'availability', ['id' => $cmid]);
+        $this->assertStringNotContainsString('"recuperacao"', $json);
+        get_fast_modinfo(0, 0, true);
+        $this->assertFalse(get_fast_modinfo($this->course->id, $sent)->get_cm($cmid)->uservisible);
     }
 
     /**

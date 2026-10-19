@@ -275,7 +275,8 @@ final class sec_m1_condition_test extends \advanced_testcase {
     }
 
     /**
-     * Deleting the round module keeps the target closed when the condition (not the legacy grouping) protects it.
+     * Deleting the round module keeps the target closed when the condition (not the legacy grouping) protects it: since
+     * M5.1 by hiding it, the condition of the round removed (ADR-035 P3, QA-M51-01).
      */
     public function test_round_deleted_target_stays_closed(): void {
         global $DB;
@@ -289,7 +290,9 @@ final class sec_m1_condition_test extends \advanced_testcase {
             course_delete_module((int) $roundcm->id); // Moodle 5.1.
         }
         target_access::reset_caches();
-        $this->assertNotNull($DB->get_field('course_modules', 'availability', ['id' => $this->target->cmid]));
+        $this->assertSame(0, (int) $DB->get_field('course_modules', 'visible', ['id' => $this->target->cmid]));
+        $json = (string) $DB->get_field('course_modules', 'availability', ['id' => $this->target->cmid]);
+        $this->assertStringNotContainsString('"recuperacao"', $json);
         $this->assertFalse($this->cm($sent)->uservisible);
         $this->assertFalse($this->cm($this->users['none'])->uservisible);
     }

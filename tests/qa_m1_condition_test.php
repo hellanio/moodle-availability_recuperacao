@@ -276,9 +276,11 @@ final class qa_m1_condition_test extends \advanced_testcase {
         $this->resetDebugging(); // Deprecated in 5.2 (MDL-86856), still the API in 5.1.
         $this->assertFalse($DB->record_exists('recuperacao', ['id' => $this->round->id]));
         $this->assertFalse($this->cm($sent)->uservisible);
-        $info = new info_module($this->cm($sent));
-        [$sql, $params] = $info->get_user_list_sql(true);
-        $this->assertNotContains($sent, array_map('intval', $DB->get_fieldset_sql($sql, $params)));
+        // Since M5.1 (ADR-035 P3, QA-M51-01) the deletion closes the activity by hiding it and removes the condition of
+        // the round from it: closed by its visibility, not by a restriction left behind.
+        $this->assertSame(0, (int) $this->cm($sent)->visible);
+        $json = (string) $DB->get_field('course_modules', 'availability', ['id' => $this->target->cmid]);
+        $this->assertStringNotContainsString('"recuperacao"', $json);
     }
 
     /**
